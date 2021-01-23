@@ -1,19 +1,45 @@
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootReducerType } from "./Store";
+import {fetchPokemonData} from './actions/PokemonAction'
 
 function App() {
+  const [pokemonName, setPokemonName] = useState("");
+  const pokemonReducer = useSelector(
+    (state: RootReducerType) => state.PokemonReducer
+  );
+  const dispatch = useDispatch();
 
-  const [number, setNumber] = useState(0)
+  const handlePokemonName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPokemonName(event.target.value);
+  };
 
-  const carculateNumber = () => {
-    setNumber(number + 1)
+  const searchButtonTapped = () => {
+    dispatch(fetchPokemonData(pokemonName))
   }
-
+ 
   return (
     <div className="App">
-      <p>hello react + typescript</p>
-      <button onClick={carculateNumber}>+</button>
-      <b>{number}</b>
+      <input value={pokemonName} onChange={handlePokemonName} />
+      <button onClick={searchButtonTapped}>포켓몬 찾기</button>
+      <div>
+        {pokemonReducer.success && (
+          <div>
+            <p>{pokemonName}</p>
+            {pokemonReducer.pokemon?.abilities.map((abilities) => {
+              return (
+                <div>
+                  <p>{abilities.ability.name}</p>
+                  <p>{abilities.slot}</p>
+                </div>
+              );
+            })}
+            <img src={pokemonReducer.pokemon?.sprites.front_default} alt='pokefront'/>
+            <img src={pokemonReducer.pokemon?.sprites.back_default} alt= "pokeback"/>
+            
+          </div>
+        )}
+      </div>
     </div>
   );
 }
